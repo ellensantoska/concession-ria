@@ -1,0 +1,170 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct Venda {
+    int notaFiscal;
+    float valor;
+    char marca[50];
+    int ano;
+    char modelo[50];
+    struct Venda* anterior;
+    struct Venda* proximo;
+} Venda;
+
+// Estrutura de Vendedores
+typedef struct Vendedor {
+    char nome[100];
+    char cpf[15];
+    int matricula;
+    Venda* vendas;
+    struct Vendedor* prox;
+} Vendedor;
+
+typedef struct ListaVendedores {
+    Vendedor* inicio;
+} ListaVendedores;
+
+void inicializarLista(ListaVendedores* lista) {
+    lista->inicio = NULL;
+}
+
+// Criar vendedores
+Vendedor* criarVendedor(const char* nome, const char* cpf, int matricula) {
+    Vendedor* novo = (Vendedor*)malloc(sizeof(Vendedor));
+    strcpy(novo->nome, nome);
+    strcpy(novo->cpf, cpf);
+    novo->matricula = matricula;
+    novo->vendas = NULL;
+    novo->prox = NULL;
+    return novo;
+}
+
+// Inserir vendedores
+void inserirVendedor(ListaVendedores* lista, const char* nome, const char* cpf, int matricula) {
+    Vendedor* novo = criarVendedor(nome, cpf, matricula);
+
+    if (lista->inicio == NULL) {
+        novo->prox = novo;
+        lista->inicio = novo;
+    } else {
+        Vendedor* atual = lista->inicio;
+        while (atual->prox != lista->inicio) {
+            atual = atual->prox;
+        }
+        atual->prox = novo;
+        novo->prox = lista->inicio;
+    }
+
+    printf(" Vendedor %s inserido com sucesso.\n", nome);
+}
+
+void removerVendedor(ListaVendedores* lista, int matricula) {
+    if (lista->inicio == NULL) {
+        printf(" Lista vazia. Nenhum vendedor para remover.\n");
+        return;
+    }
+
+    Vendedor* atual = lista->inicio;
+    Vendedor* anterior = NULL;
+
+    do {
+        if (atual->matricula == matricula) {
+            if (anterior == NULL) {
+                Vendedor* ultimo = lista->inicio;
+                while (ultimo->prox != lista->inicio) {
+                    ultimo = ultimo->prox;
+                }
+
+                if (atual->prox == atual) {
+                    lista->inicio = NULL;
+                } else {
+                    lista->inicio = atual->prox;
+                    ultimo->prox = lista->inicio;
+                }
+            } else {
+                anterior->prox = atual->prox;
+                if (atual == lista->inicio)
+                    lista->inicio = atual->prox;
+            }
+
+            free(atual);
+            printf(" Vendedor removido com sucesso.\n");
+            return;
+        }
+
+        anterior = atual;
+        atual = atual->prox;
+    } while (atual != lista->inicio);
+
+    printf(" Vendedor com matrícula %d não encontrado.\n", matricula);
+}
+
+void listarVendedores(ListaVendedores* lista) {
+    if (lista->inicio == NULL) {
+        printf("Lista de vendedores vazia.\n");
+        return;
+    }
+
+    Vendedor* atual = lista->inicio;
+    printf("\n Lista de Vendedores:\n");
+    do {
+        printf("Nome: %s | CPF: %s | Matrícula: %d\n", atual->nome, atual->cpf, atual->matricula);
+        atual = atual->prox;
+    } while (atual != lista->inicio);
+}
+
+int main() {
+    ListaVendedores lista;
+    inicializarLista(&lista);
+
+    int opcao;
+    char nome[100], cpf[15];
+    int matricula;
+
+    do {
+        printf("\n===== MENU =====\n");
+        printf("1. Inserir Vendedor\n");
+        printf("2. Remover Vendedor\n");
+        printf("3. Listar Vendedores\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar(); // Limpa buffer
+
+        switch (opcao) {
+            case 1:
+                printf("Nome: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';  // Remove o \n
+                printf("CPF: ");
+                fgets(cpf, sizeof(cpf), stdin);
+                cpf[strcspn(cpf, "\n")] = '\0';
+                printf("Matrícula: ");
+                scanf("%d", &matricula);
+                getchar();
+
+                inserirVendedor(&lista, nome, cpf, matricula);
+                break;
+
+            case 2:
+                printf("Digite a matrícula do vendedor a remover: ");
+                scanf("%d", &matricula);
+                getchar();
+                removerVendedor(&lista, matricula);
+                break;
+
+            case 3:
+                listarVendedores(&lista);
+                break;
+
+            case 0:
+                printf("Encerrando o programa...\n");
+                break;
+
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
