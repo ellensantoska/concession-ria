@@ -144,6 +144,8 @@ void cadastrarVenda(int matricula, ListaVendedores* lista){
     printf("\nDigite as informações.\n");
     printf("Nº Nota fiscal: ");
     scanf("%d", &novaVenda->notaFiscal);
+    printf("Valor: ");
+    scanf("%f", &novaVenda->valor);
     printf("Marca: ");
     scanf("%s", novaVenda->marca);
     printf("Ano: ");
@@ -166,6 +168,59 @@ void cadastrarVenda(int matricula, ListaVendedores* lista){
         novaVenda->anterior = temp;
     }
     printf("\nNova venda cadastrada com sucesso.");
+    free(aux);
+}
+
+void totalVendasPorVendedor(ListaVendedores* lista) {
+    //cria um ponteiro para percerrer a lista, começando pelo inicio
+    Vendedor* vend = lista->inicio;
+    Vendedor* primeiro = vend;
+    printf("\nTotal de vendas por vendedor:\n");
+    //inicia um laço que passa por todos os vendedores ate o final == NULL 
+    do{
+        float total = 0;
+        Venda* v = vend->vendas;
+        //cria um ponteiro v para busca do vendendor atual, comecando pelo primeiro
+        //adiciona vendas enquanto houverem até o acumulo total
+        while (v != NULL) {
+            total += v->valor;
+            v = v->proximo;
+        }
+        //impressao de resultado de soma por vendedor
+        printf("Vendedor: %s = Total: R$ %.2f\n", vend->nome, total);
+        vend = vend->prox;
+    } while (vend != primeiro);
+}
+//funcao que recebe a lista de vendedores e a marca do carro
+void exibirVendasPorMarca(ListaVendedores* lista, char* marcaAlvo) {
+    //inicia o ponteiro para vendedores
+    Vendedor* vend = lista->inicio;
+    Vendedor* primeiro = vend;
+    //variavel de controle para que o laço tenha inicialização correta
+    int encontrou = 0;
+    printf("\nVendas da marca %s\n", marcaAlvo);
+    //busca enquanto houver vendedor
+    do {
+        //cria um ponteiro para lista de vendedor atual 
+        Venda* v = vend->vendas;
+        //busca enquanto houver vendas
+        while (v != NULL) {
+            //compara a marca atual com marca buscada, caso sejam iguais imprime os dados 
+            if (strcmp(v->marca, marcaAlvo) == 0) {
+                printf("Vendedor: %s | Nota: %d | Modelo: %s | Ano: %d | Valor: R$ %.2f\n",
+                       vend->nome, v->notaFiscal, v->modelo, v->ano, v->valor);
+                //mudança de marca para que haja pelo menos uma marca naquele endereço
+                encontrou = 1;
+            }
+            //avança para a proxima verificação
+            v = v->proximo;
+        }
+        //passa para o proximo vendedor depois de percorrer o atual
+        vend = vend->prox;
+    }while (vend != primeiro);
+    if (!encontrou) {
+        printf("Nenhuma venda encontrada para essa marca.\n");
+    }
 }
 
 int main() {
@@ -182,6 +237,8 @@ int main() {
         printf("2. Remover Vendedor\n");
         printf("3. Listar Vendedores\n");
         printf("4. Cadastrar Venda\n");
+        printf("5. Total de vendas por vendedor\n");
+        printf("6. Total de vendas por marca\n");
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
@@ -223,7 +280,17 @@ int main() {
                 getchar();
                 cadastrarVenda(matricula,&lista);
                 break;
-
+            case 5:
+                totalVendasPorVendedor(&lista);
+                break;
+            case 6:{
+                char marca[50];
+                printf("\nDigite a marca:");
+                fgets(marca, sizeof(marca), stdin);
+                marca[strcspn(marca, "\n")] = '\0';
+                exibirVendasPorMarca(&lista, marca);
+                break;
+            }
             case 0:
                 printf("Encerrando o programa...\n");
                 break;
