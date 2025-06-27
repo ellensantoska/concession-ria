@@ -113,6 +113,61 @@ void listarVendedores(ListaVendedores* lista) {
     } while (atual != lista->inicio);
 }
 
+void cadastrarVenda(int matricula, ListaVendedores* lista){
+    Venda* novaVenda = (Venda*)malloc(sizeof(Venda));
+    char nomeVendedor[100];
+    int vendedorEncontrado = 0;
+    
+    if(!novaVenda){
+        printf("\nErro ao adicionar nova venda. - Contate o Suporte\n");
+        return;
+    }
+    
+    Vendedor* aux = lista->inicio;
+    //Percorre a lista para encontrar o vendedor da matrícula desejada
+    while(aux != NULL){
+        if(aux->matricula == matricula){
+            strcpy(nomeVendedor, aux->nome);
+            vendedorEncontrado = 1;
+            break;
+        }
+        aux = aux->prox;
+    }
+    //Flag para ver se a matricula corresponde a um vendedor
+    if(vendedorEncontrado == 1){
+        printf("\nCadastrando venda no vendedor: %s", nomeVendedor);
+    }else{
+        printf("\nVendedor não encontrado. Digite a matricula correta.");
+        return;
+    }
+    
+    printf("\nDigite as informações.\n");
+    printf("Nº Nota fiscal: ");
+    scanf("%d", &novaVenda->notaFiscal);
+    printf("Marca: ");
+    scanf("%s", novaVenda->marca);
+    printf("Ano: ");
+    scanf("%d", &novaVenda->ano);
+    printf("Modelo: ");
+    scanf("%s", novaVenda->modelo);
+    
+    novaVenda->proximo = NULL;
+    novaVenda->anterior = NULL;
+    
+    //Verifica se o vendedor já fez alguma venda
+    if(aux->vendas == NULL){
+        aux->vendas = novaVenda;
+    }else{
+        Venda* temp = aux->vendas;
+        while(temp->proximo != NULL) {
+            temp = temp->proximo;
+        }//Percorre a lista de vendas para inserir a nova venda no final
+        temp->proximo = novaVenda;
+        novaVenda->anterior = temp;
+    }
+    printf("\nNova venda cadastrada com sucesso.");
+}
+
 int main() {
     ListaVendedores lista;
     inicializarLista(&lista);
@@ -126,6 +181,7 @@ int main() {
         printf("1. Inserir Vendedor\n");
         printf("2. Remover Vendedor\n");
         printf("3. Listar Vendedores\n");
+        printf("4. Cadastrar Venda\n");
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
@@ -155,6 +211,17 @@ int main() {
 
             case 3:
                 listarVendedores(&lista);
+                break;
+            
+            case 4:
+                if(lista.inicio == NULL){
+                    printf("\nNenhum vendedor cadastrado. Cadastre um vendedor para cadastrar uma venda.\n");
+                    break;
+                }
+                printf("\nDigite a matrícula: ");
+                scanf("%d", &matricula);
+                getchar();
+                cadastrarVenda(matricula,&lista);
                 break;
 
             case 0:
