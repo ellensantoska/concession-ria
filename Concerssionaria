@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// Estrutura de Vendas
 typedef struct Venda {
     int notaFiscal;
     float valor;
@@ -19,7 +20,7 @@ typedef struct Vendedor {
     Venda* vendas;
     struct Vendedor* prox;
 } Vendedor;
-
+// Contém um ponteiro para o primeiro vendedor da lista (lista circular).
 typedef struct ListaVendedores {
     Vendedor* inicio;
 } ListaVendedores;
