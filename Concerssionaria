@@ -168,9 +168,8 @@ void cadastrarVenda(int matricula, ListaVendedores* lista){
         novaVenda->anterior = temp;
     }
     printf("\nNova venda cadastrada com sucesso.");
-    free(aux);
 }
-
+// Total de Vendas
 void totalVendasPorVendedor(ListaVendedores* lista) {
     //cria um ponteiro para percerrer a lista, começando pelo inicio
     Vendedor* vend = lista->inicio;
@@ -187,9 +186,64 @@ void totalVendasPorVendedor(ListaVendedores* lista) {
             v = v->proximo;
         }
         //impressao de resultado de soma por vendedor
-        printf("Vendedor: %s = Total: R$ %.2f\n", vend->nome, total);
+        printf("Vendedor: %s = Total: R$ %.3f\n", vend->nome, total);
         vend = vend->prox;
     } while (vend != primeiro);
+}
+// Valor total da Concessionaria
+void valorTotalConcessionaria(ListaVendedores* lista) {
+    if (lista->inicio == NULL) {
+        printf("Nenhum vendedor cadastrado.\n");
+        return;
+    }
+
+    Vendedor* vend = lista->inicio;
+    Vendedor* primeiro = vend;
+    float totalGeral = 0;
+
+    do {
+        Venda* v = vend->vendas;
+        while (v != NULL) {
+            totalGeral += v->valor;
+            v = v->proximo;
+        }
+        vend = vend->prox;
+    } while (vend != primeiro);
+
+    printf("\nValor total de todas as vendas da concessionaria: R$ %.2f\n", totalGeral);
+}
+
+void vendedorComMaisLucro(ListaVendedores* lista) {
+    if (lista->inicio == NULL) {
+        printf("Nenhum vendedor cadastrado.\n");
+        return;
+    }
+
+    Vendedor* vend = lista->inicio;
+    Vendedor* primeiro = vend;
+    float maiorTotal = 0;
+    char nomeTop[100] = "";
+
+    do {
+        float total = 0;
+        Venda* v = vend->vendas;
+        while (v != NULL) {
+            total += v->valor;
+            v = v->proximo;
+        }
+
+        if (total > maiorTotal) {
+            maiorTotal = total;
+            strcpy(nomeTop, vend->nome);
+        }
+
+        vend = vend->prox;
+    } while (vend != primeiro);
+
+    if (maiorTotal > 0)
+        printf("\nVendedor com maior lucro: %s (R$ %.2f)\n", nomeTop, maiorTotal);
+    else
+        printf("\nNenhuma venda registrada ate agora.\n");
 }
 //funcao que recebe a lista de vendedores e a marca do carro
 void exibirVendasPorMarca(ListaVendedores* lista, char* marcaAlvo) {
@@ -239,6 +293,8 @@ int main() {
         printf("4. Cadastrar Venda\n");
         printf("5. Total de vendas por vendedor\n");
         printf("6. Total de vendas por marca\n");
+        printf("7. Total de vendas da Concessionaria\n");
+        printf("8. Vendedor que deu mais lucro\n");
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
@@ -291,6 +347,13 @@ int main() {
                 exibirVendasPorMarca(&lista, marca);
                 break;
             }
+            case 7:
+                valorTotalConcessionaria(&lista);
+                break;
+
+            case 8:
+                vendedorComMaisLucro(&lista);
+                break;
             case 0:
                 printf("Encerrando o programa...\n");
                 break;
