@@ -126,14 +126,14 @@ void cadastrarVenda(int matricula, ListaVendedores* lista){
     
     Vendedor* aux = lista->inicio;
     //Percorre a lista para encontrar o vendedor da matrícula desejada
-    while(aux != NULL){
+    do{
         if(aux->matricula == matricula){
             strcpy(nomeVendedor, aux->nome);
             vendedorEncontrado = 1;
             break;
         }
         aux = aux->prox;
-    }
+    }while(aux != lista->inicio);
     //Flag para ver se a matricula corresponde a um vendedor
     if(vendedorEncontrado == 1){
         printf("\nCadastrando venda no vendedor: %s", nomeVendedor);
